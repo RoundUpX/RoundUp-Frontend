@@ -110,7 +110,7 @@ const TransactionOverview = () => {
     <View style={styles.container1}>
       {/* Add Transaction Form */}
       
-      <TextInput
+      {/* <TextInput
         style={styles.input}
         placeholder="Amount"
         value={amount}
@@ -130,7 +130,7 @@ const TransactionOverview = () => {
         onChangeText={setMerchant}
         placeholder="Merchant (optional)"
       />
-      <Button title={loading ? "Adding..." : "Add Transaction"} onPress={addTransaction} disabled={loading} />
+      <Button title={loading ? "Adding..." : "Add Transaction"} onPress={addTransaction} disabled={loading} /> */}
 
       {/* Transaction List */}
 

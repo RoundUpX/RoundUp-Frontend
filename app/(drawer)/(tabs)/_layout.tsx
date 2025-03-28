@@ -47,7 +47,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Records"
         options={{
-          title: 'Records',
+          title: 'Transaction',
           tabBarIcon: ({ color }) => (
             <Ionicons name="list"  color={color} />
           ),
@@ -73,9 +73,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Chat',
+          title: 'Settings',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="heart" color={color} />
+            <Ionicons name="settings" color={color} />
           ),
         }}
       />
