@@ -12,17 +12,11 @@ export const COLORS = {
   
     accent: '#4CAF50',
     danger: '#FF4444',
-  
-    chartColors: [
-      '#FF6B6B',
-      '#4ECDC4', 
-      '#FFD93D',
-      '#6C5CE7',
-      '#A8E6CF',
-      '#FF8B94',
-      '#45B7D1',
-      '#96CEB4',
-      '#FFEEAD',
-      '#D4A5A5',
-    ],
+
+    black:  '#020100',
+    PURPLE:  '#584A90', 
+    SEXY_white:  '#C5FFFD',
+    SUNDAR:  '#88D9E6',
+    BETTER_Pink:  '#CE7DA5'
+    
   };

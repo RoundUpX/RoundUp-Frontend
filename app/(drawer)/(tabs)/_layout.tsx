@@ -26,7 +26,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: COLORS.secondary,
+        tabBarActiveTintColor: COLORS.PURPLE,
         headerShown: false,
         tabBarStyle: {
           backgroundColor: COLORS.background,
@@ -58,6 +58,14 @@ export default function TabLayout() {
         options={{
           title: 'Analysis',
           tabBarIcon: ({ color }) => <Ionicons name="analytics" color={color} />,
+          
+        }}
+      />
+      <Tabs.Screen
+        name="camera"
+        options={{
+          title: 'Camera',
+          tabBarIcon: ({ color }) => <Ionicons name="camera" color={color} />,
           
         }}
       />
