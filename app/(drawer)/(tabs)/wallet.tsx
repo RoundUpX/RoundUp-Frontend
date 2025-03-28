@@ -14,30 +14,7 @@ import {
 } from 'react-native-responsive-screen';
 import Header from '../../../components/Header';
 import TransactionOverview from '@/components/transactions';
-// import {TransactionOverview} from '@/components/transactions';
 
-const getUsers = () => {
-  return [
-    { id: 1, username: 'john_doe', email: 'john@example.com' },
-    { id: 2, username: 'jane_smith', email: 'jane@example.com' }
-  ];
-};
-
-const getTransactionsByUserId = (userId) => {
-  const transactions = [
-    { id: 1, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '24/03/26', merchant: 'Lunch' },
-    { id: 2, user_id: 1, amount: 200.50, category: 'Transportation', roundup: '2', date: '24/03/26', merchant: 'Bus fare' },
-    { id: 3, user_id: 2, amount: 50.75, category: 'Health & Fitness', roundup: '5', date: '25/03/26', merchant: 'Gym membership' },
-    { id: 4, user_id: 1, amount: 210.50, category: 'Transportation', roundup: '2', date: '24/03/26', merchant: 'Bus fare' },
-    { id: 5, user_id: 1, amount: 50.75, category: 'Health & Fitness', roundup: '5', date: '24/03/26', merchant: 'Gym membership' },
-    { id: 6, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '24/03/26', merchant: 'Gym membership' },
-    { id: 7, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '24/03/26', merchant: 'Gym membership' },
-    { id: 8, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '24/03/26', merchant: 'Lunch' },
-    { id: 9, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '24/03/26', merchant: 'Gym membership' },
-    { id: 10, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '24/03/26', merchant: 'Lunch' },
-  ];
-  return transactions.filter(txn => txn.user_id === userId);
-};
 
 const WalletScreen = () => {
   const currencySymbol = '₹';
@@ -50,15 +27,6 @@ const WalletScreen = () => {
     'Bank Account': 0,
     'Investment': 0
   });
-
-  const [selectedUser, setSelectedUser] = useState(getUsers()[0]); // Default user
-  const [transactions, setTransactions] = useState([]);
-
-  // Fetch transactions for selected user
-  useEffect(() => {
-    const userTransactions = getTransactionsByUserId(selectedUser.id);
-    setTransactions(userTransactions);
-  }, [selectedUser]);
 
   // Calculate saved amount
   const savedAmount = accountBalances['Cash'] + accountBalances['Savings'];
@@ -122,7 +90,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: wp('4%'),
     width:wp('60%'),
-    // backgroundColor: COLORS.background,
     backgroundColor: COLORS.lightbackground,
     borderRadius: wp('2%'),
     marginHorizontal: wp('2%'),

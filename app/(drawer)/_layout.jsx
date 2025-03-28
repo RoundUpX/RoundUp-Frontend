@@ -18,33 +18,19 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { useTranslation } from 'react-i18next';
 import { COLORS } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import { useNavigation } from '@react-navigation/native'; // Add this for navigation
+
 const CustomDrawerContent = (props) => {
   const router = useRouter();
-  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const { t, i18n } = useTranslation();
-  const [state, setState] = useState({ language: 'English' });
+  const navigation = useNavigation(); // Use navigation hook  const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleLanguageSelect = (language) => {
-    console.log("Current language in state:", state.language);
-    changeLanguage(language);
-    setIsModalVisible(false);
-    console.log("Language changed to", language);
-  };
-
-
-  useEffect(() => {
-    if (state.language && i18n.language !== state.language) {
-      // i18n.changeLanguage(state.language);
-    } else {
-      // i18n.changeLanguage(state.language);
-    }
-  }, [state.language]);
-
-
+  const CameraTab = () => (
+    <Tab.Navigator>
+      <Tab.Screen name="Camera" component={CameraScreen} />
+    </Tab.Navigator>
+  );
   return (
     <>
       <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContent}>
@@ -59,7 +45,7 @@ const CustomDrawerContent = (props) => {
             source={require("../../assets/images/icon.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>{t('RoundUP')}</Text>
+          <Text style={styles.userName}>{'RoundUP'}</Text>
         </View>
         <View style={styles.drawerItemsContainer}>
           {props.state.routes
@@ -67,7 +53,7 @@ const CustomDrawerContent = (props) => {
             .map((route) => (
               <DrawerItem
                 key={route.key}
-                label={t(props.descriptors[route.key].options.drawerLabel || route.name)}
+                label={props.descriptors[route.key].options.drawerLabel || route.name}
                 icon={props.descriptors[route.key].options.drawerIcon}
                 labelStyle={{
                   color: selectedItem === route.key ? COLORS.secondary : COLORS.text.primary,
@@ -84,43 +70,46 @@ const CustomDrawerContent = (props) => {
             ))}
 
           <DrawerItem
-            label={t('Scan QR')}
+            label={'Scan QR'}
             icon={() => <MaterialIcons name="qr-code-scanner" size={wp("6%")} color={"#000000"} />}
-            // onPress={handleScanQR}
+            onPress={() => {
+              // Navigate to the Camera tab in the Tabs layout
+              router.push('/(tabs)/camera'); // Correct path to camera tab
+            }}// Navigate to Camera tab
             labelStyle={{ color: COLORS.background }}
           />
           <DrawerItem
-            label={t('Request Data')}
+            label={'Request Data'}
             icon={() => <Ionicons name="exit" size={wp("6%")} color={"#000000"} />}
             onPress={() => Linking.openURL("")}
             labelStyle={{ color: COLORS.background }}
           />
            <DrawerItem
-              label={t('CurrencySettings')}
-              icon={() => <MaterialIcons name="money" size={wp("6%")} color="#1f1f1f" />}
+              label={'Settings'}
+              icon={() => <MaterialIcons name="settings" size={wp("6%")} color="#1f1f1f" />}
               labelStyle={{ color: COLORS.background }}
             />      
             <DrawerItem
-              label={t('Help Us')}
+              label={'Help Us'}
               icon={() => <MaterialIcons name="currency-rupee" size={wp("6%")} color={"#000000"} />}
               // onPress={handleScanQR}
               labelStyle={{ color: COLORS.background }}
             />
           <DrawerItem
-            label={t('Backup')}
+            label={'Backup'}
             icon={() => <MaterialIcons name="logout" size={wp("6%")} color="#1f1f1f" />}
             onPress={() => router.push('/signup')}
             labelStyle={{ color: COLORS.background }}
           />          
           <DrawerItem
 
-            label={t('Help')}
+            label={'Help'}
             icon={() => <MaterialIcons name="help-outline" size={wp("6%")} color={"#000000"} />}
             onPress={() => Linking.openURL("")}
             labelStyle={{ color: COLORS.background }}
           />
           <DrawerItem
-            label={t('Feedback')}
+            label={'Feedback'}
             icon={() => <MaterialIcons name="feedback" size={wp("6%")} color={"#000000"} />}
             onPress={() => Linking.openURL("")}
             labelStyle={{ color: COLORS.background }}

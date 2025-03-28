@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity,Button } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 
-export default function App() {
+export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);

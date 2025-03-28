@@ -5,10 +5,21 @@ import RNPickerSelect from 'react-native-picker-select'; // Importing RNPickerSe
 import { COLORS } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is installed and imported
 
+
+import { SvgXml } from "react-native-svg";
+import icons from "../assets/icons/icons"; // Import all icons
+
+const Icon = ({ name, width = 24, height = 24 }) => {
+  const icon = icons[name];
+  if (!icon) return null;
+  return <SvgXml xml={icon} width={width} height={height} />;
+};
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+
 
 // Fake Data for Testing
 const getUsers = () => {
@@ -125,7 +136,7 @@ const TransactionOverview = () => {
                   activeOpacity={0.7}
                 >
                   <View style={styles.newContent}>
-                    <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> Icon for Left Side
+                    <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> 
                     <View style={styles.second}>
                     <View style={styles.mainContent}>
                       <View style={styles.leftContent}>

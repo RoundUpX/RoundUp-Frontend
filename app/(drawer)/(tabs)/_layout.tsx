@@ -11,6 +11,7 @@ import { Pressable } from 'react-native';
 import { COLORS } from '@/constants/Colors';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
+// import CameraScreen from './camera';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 // function TabBarIcon(props: {
@@ -63,6 +64,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="camera"
+        // component={CameraScreen}
         options={{
           title: 'Camera',
           tabBarIcon: ({ color }) => <Ionicons name="camera" color={color} />,
