@@ -15,9 +15,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import * as Haptics from 'expo-haptics';
 import { useUserPreferences } from '../hooks/useUserPreferences';
 import { COLORS } from '../constants/theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-// import { useGlobalContext } from '../components/globalProvider';
+
 const BUTTON_WIDTH = wp(15);
 const CONTAINER_WIDTH = wp(85);
 const THRESHOLD = CONTAINER_WIDTH - BUTTON_WIDTH - wp(2.5);
@@ -102,23 +101,6 @@ const WelcomeScreen = () => {
 
 //   const { state, dispatch, changeLanguage } = useGlobalContext();
   const { t ,i18n} = useTranslation();
-
-//   const handleLanguageSelect = (language) => {
-//     console.log("Current language in state:", state.language);
-//     changeLanguage(language);
-//     setIsModalVisible(false); 
-//     console.log("Language changed to", language);
-// };
-
-// useEffect(() => {
-    
-//   if (state.language && i18n.language !== state.language) {
-//     i18n.changeLanguage(state.language);
-//   }
-//   else{
-//     i18n.changeLanguage(state.language);
-//   }
-// }, [state.language]);
 
   useEffect(() => {
     Animated.parallel([

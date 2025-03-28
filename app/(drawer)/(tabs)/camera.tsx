@@ -43,6 +43,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+          <Text style={styles.text}>Flip Camera</Text>
+        </TouchableOpacity>
+        </View>
       <CameraView
         style={styles.camera}
         ref={cameraRef}
@@ -57,11 +62,6 @@ export default function App() {
           <Text style={styles.scannedMessage}>Scanned QR Code: {scannedData}</Text>
         </View>
       )}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-          <Text style={styles.text}>Flip Camera</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    margin: 64,
+    // margin: 64,
   },
   button: {
     flex: 1,

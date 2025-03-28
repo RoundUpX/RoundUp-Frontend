@@ -108,32 +108,6 @@ const TransactionOverview = () => {
 
   return (
     <View style={styles.container1}>
-      {/* Add Transaction Form */}
-      
-      {/* <TextInput
-        style={styles.input}
-        placeholder="Amount"
-        value={amount}
-        onChangeText={setAmount}
-        keyboardType="numeric"
-      />
-      <RNPickerSelect
-        style={pickerSelectStyles}
-        placeholder={{ label: "Select a Category", value: null }}
-        value={category}
-        onValueChange={(value) => setCategory(value)}
-        items={EXPENSE_CATEGORIES}
-      />
-      <TextInput
-        style={styles.input}
-        value={merchant}
-        onChangeText={setMerchant}
-        placeholder="Merchant (optional)"
-      />
-      <Button title={loading ? "Adding..." : "Add Transaction"} onPress={addTransaction} disabled={loading} /> */}
-
-      {/* Transaction List */}
-
       <View style={styles.container}>
         {/* Transaction List */}
         <ScrollView>
@@ -150,45 +124,49 @@ const TransactionOverview = () => {
                   onPress={() => viewTransaction(transaction.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.mainContent}>
-                    <View style={styles.leftContent}>
-                      <Text style={styles.category}>
-                        {transaction.category || 'Uncategorized'}
+                  <View style={styles.newContent}>
+                    <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> Icon for Left Side
+                    <View style={styles.second}>
+                    <View style={styles.mainContent}>
+                      <View style={styles.leftContent}>
+                        <Text style={styles.category}>
+                          {transaction.category || 'Uncategorized'}
+                        </Text>
+                      </View>
+                      <Text
+                        style={styles.amount}
+                      >
+                        {formattedAmount}
                       </Text>
                     </View>
-                    <Text
-                      style={styles.amount}
-                    >
-                      {formattedAmount}
+
+                    <Text style={styles.round}>
+                      {'Rounded ' + roundedAmount || ''}
                     </Text>
-                  </View>
 
-                  <Text style={styles.round}>
-                    {'Rounded ' + roundedAmount || ''}
-                  </Text>
+                    <View style={styles.bottomRow}>
+                      <View style={styles.leftInfo}>
+                        <Text style={styles.merchant}>
+                          {transaction.merchant || ''}
+                        </Text>
+                        <Text style={styles.dot}>•</Text>
+                        <Text style={styles.date}>
+                          {transaction.date}
+                        </Text>
+                      </View>
 
-                  <View style={styles.bottomRow}>
-                    <View style={styles.leftInfo}>
-                      <Text style={styles.merchant}>
-                        {transaction.merchant || ''}
-                      </Text>
-                      <Text style={styles.dot}>•</Text>
-                      <Text style={styles.date}>
-                        {transaction.date}
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity
-                      // onPress={alert('You cant delete this')}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      style={styles.deleteButton}
-                    >
-                      <Ionicons
-                        name="trash-outline"
-                        size={wp('3.8%')}
-                        color={'#ff6b6b'}
-                      />
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        // onPress={alert('You cant delete this')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        style={styles.deleteButton}
+                      >
+                        <Ionicons
+                          name="search"
+                          size={wp('3.8%')}
+                          color={'#8a36c9'}
+                        />
+                      </TouchableOpacity>
+                    </View></View>
                   </View>
                 </TouchableOpacity>
               );
@@ -204,43 +182,30 @@ const TransactionOverview = () => {
 
 
 const styles = StyleSheet.create({
-  container1: {
-    flex: 1,
-    padding: 16,
-    paddingTop:0,
-    marginTop:0,
-    width: wp('100%'),
-    // margin:hp('2%'),
-    // backgroundColor:'#fff',
-    // justifyContent: 'center',
-  },
-  transactionList: { flex: 1, backgroundColor: COLORS.background },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
-    fontSize: 16,
-  },
-  transactionItem: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 5,
-  },
-  transactionText: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
 
   container: {
-    
-    padding: wp('4%'),
+    width:'100%',
+    padding: wp('2%'),
     // paddingBlockEnd: wp('8%'),
     backgroundColor: COLORS.background, // Adjust to your preferred background color
-    borderBottomWidth: 0.8,
+    borderBottomWidth: 0.3,
     borderBottomColor: '#ddd', // Adjust the divider color as needed
+  },
+  newContent:{
+    alignSelf:'center',
+    alignItems: 'center',
+    padding: wp('4%'),
+    width:wp('90%'),
+    // backgroundColor: COLORS.background,
+    backgroundColor: COLORS.lightbackground,
+    borderRadius: wp('4%'),
+    marginHorizontal: wp('2%'),
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent:'space-between',
+  },
+  second:{
+    width:'85%',
   },
   mainContent: {
     flexDirection: 'row',
@@ -261,8 +226,8 @@ const styles = StyleSheet.create({
     // paddingRight: hp('%'),
     fontSize: wp('4%'),
     fontWeight: '500',
-    color:COLORS.text.secondary,
-    opacity:0.8
+    color: COLORS.text.secondary,
+    opacity: 0.8
   },
   round: {
     fontSize: wp('3.5%'),
@@ -291,7 +256,7 @@ const styles = StyleSheet.create({
   date: {
     fontSize: wp('3.2%'),
     color: COLORS.secondary,
-    opacity:0.7
+    opacity: 0.7
   },
   deleteButton: {
     opacity: 0.6,

@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    // paddingTop:hp('4%'),
+    paddingTop:hp('2%'),
     justifyContent: 'center',
     backgroundColor:COLORS.background,
   },
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     // fontWeight: 'bold',
   },
   separator: {
-    marginVertical: 15,
+    marginVertical: 5,
     height: 1,
     width: '80%',
   },
