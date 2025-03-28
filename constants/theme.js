@@ -15,7 +15,7 @@ export const COLORS = {
 
     black:  '#020100',
     PURPLE:  '#584A90', 
-    SEXY_white:  '#C5FFFD',
+    SEXY_white:  '#FFFFFF',
     SUNDAR:  '#88D9E6',
     BETTER_Pink:  '#CE7DA5'
     

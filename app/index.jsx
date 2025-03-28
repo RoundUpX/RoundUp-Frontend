@@ -10,6 +10,16 @@ import {
   Platform,
   Image,
 } from 'react-native';
+
+import { registerRootComponent } from "expo";
+import { AppRegistry } from "react-native";
+import App from "./_layout";
+import { name as appName } from "../app.json";
+
+// Register the app for both Expo and standalone builds
+registerRootComponent(App);
+AppRegistry.registerComponent(appName, () => App);
+
 import { useRouter } from 'expo-router';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import * as Haptics from 'expo-haptics';
@@ -281,18 +291,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circle: {
-    width: wp(12),
-    height: wp(12),
+    width: wp(12), // Increase size if necessary
+    height: wp(12), 
     backgroundColor: COLORS.whiteBg,
-    borderRadius: wp(6),
+    borderRadius: wp(6), 
     justifyContent: 'center',
     alignItems: 'center',
+    display: 'flex', // Ensures flex behavior is respected
   },
   arrow: {
     color: COLORS.primary,
-    fontSize: wp(5),
+    fontSize: wp(5.5), // Adjust based on how it looks
     fontWeight: 'bold',
-  },
+    textAlign: 'center',
+    lineHeight: wp(6.5), // Ensures the text is vertically aligned
+  },  
   slideText: {
     paddingLeft: wp(18),
     alignItems: 'flex-start',
