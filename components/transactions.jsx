@@ -184,7 +184,7 @@ const TransactionOverview = () => {
                       style={styles.deleteButton}
                     >
                       <Ionicons
-                        name=""
+                        name="trash-outline"
                         size={wp('3.8%')}
                         color={'#ff6b6b'}
                       />
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
   round: {
     fontSize: wp('3.5%'),
-    color: '#88D9E6',
+    color: '#6c757d',
     // marginBottom: hp('1%'),
   },
   bottomRow: {
