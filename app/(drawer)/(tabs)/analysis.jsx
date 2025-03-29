@@ -87,7 +87,7 @@ const Analysis = () => {
           end={{ x: 1, y: 1 }}
           style={styles.DreamContainer}
         >
-          <Text style={styles.chartTitle}>Goal Completion</Text>
+          <Text style={styles.chartTitle}>Goal Name</Text>
           <Text style={styles.progressText}>
             <Text style={styles.boldText}>{"₹" + remainingGoalAmount.toFixed(2)}</Text>
             {" remaining"}

@@ -7,7 +7,7 @@ import {
   ScrollView,
   ActivityIndicator
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/theme';
 import {
   widthPercentageToDP as wp,
@@ -63,6 +63,8 @@ const WalletScreen = () => {
 
         const transactionsData = await transactionsResponse.json();
 
+        console.log(transactionsData)
+
         // Update state with fetched data
         setWalletBalance(balanceData.balance || 0);
         setTransactions(transactionsData || []);
@@ -112,7 +114,7 @@ const WalletScreen = () => {
         <View style={styles.totalBalance}>
           <Ionicons name="wallet" size={wp('8%')} color={COLORS.text.primary} />
           <View style={styles.dailySavingTextContainer}>
-            <Text style={styles.totalBalanceLabel}>{'Total Amount'}</Text>
+            <Text style={styles.totalBalanceLabel}>{'Wallet Balance'}</Text>
             <Text style={[styles.totalBalanceAmount, { color: walletBalance >= 0 ? '#51cf66' : '#ff6b6b' }]}>
               {currencySymbol}{Math.abs(walletBalance).toFixed(2)}
             </Text>
@@ -122,23 +124,23 @@ const WalletScreen = () => {
         {/* Daily Saving Average Section */}
         <View style={styles.dailySavingContainer}>
           <View style={styles.dailySavingBox}>
-            <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} />
+            <MaterialIcons name="currency-rupee" size={wp('6%')} color={COLORS.text.primary} />
             <View style={styles.dailySavingTextContainer}>
               <Text style={styles.dailySavingLabel}>Daily Expenses</Text>
-              <Text style={styles.dailySavingAmount}>{currencySymbol}{dailySavingAverage.toFixed(2)}</Text>
+              <Text style={styles.dailySavingAmount}>{dailySavingAverage.toFixed(2)}</Text>
             </View>
           </View>
           <View style={styles.dailySavingBox}>
             <Ionicons name="wallet" size={wp('6%')} color={COLORS.text.primary} />
             <View style={styles.dailySavingTextContainer}>
-              <Text style={styles.dailySavingLabel}>Daily Saving</Text>
+              <Text style={styles.dailySavingLabel}>Daily Savings</Text>
               <Text style={styles.dailySavingAmount}>{currencySymbol}{dailySavingAverage.toFixed(2)}</Text>
             </View>
           </View>
         </View>
 
         {/* Recent Transactions Section */}
-        <Text style={styles.sectionTitle}>{'Recent Transactions'}</Text>
+        <Text style={styles.sectionTitle}>{'Wallet Transactions'}</Text>
         <View style={styles.transactionsList}>
           <TransactionOverview transactions={transactions} />
         </View>

@@ -12,8 +12,7 @@ export default function Records() {
   return (<>
     <Header searchIconShown={''}/>
     <View style={styles.container}>
-      <Text style={styles.title}>Transactions Log</Text>
-      <View style={styles.separator} Color="rgba(68, 24, 24, 0.52)" />
+      <Text style={styles.title}>Transactions</Text>
       <TransactionOverview/>
     </View>
     </>
