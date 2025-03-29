@@ -4,9 +4,10 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';  // Importing Ionicons
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../../constants/theme';
 import {
   widthPercentageToDP as wp,
@@ -15,51 +16,120 @@ import {
 import Header from '../../../components/Header';
 import TransactionOverview from '@/components/transactions';
 
-
 const WalletScreen = () => {
   const currencySymbol = '₹';
+  const API_BASE_URL = 'http://10.42.0.1:8082/api/v1';
 
-  // Example data for account balances (Can be updated dynamically)
-  const [accountBalances, setAccountBalances] = useState({
-    'Credit Card': 0,
-    'Cash': 5000,
-    'Savings': 15000,
-    'Bank Account': 0,
-    'Investment': 0
-  });
+  // State for wallet data
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Calculate saved amount
-  const savedAmount = accountBalances['Cash'] + accountBalances['Savings'];
+  // Fetch wallet balance and transactions
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch balance
+        const balanceResponse = await fetch(`${API_BASE_URL}/wallet/balance`, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM0OTI0OTcsInVzZXJfaWQiOiI5OGVlOTE5ZS1kYzI4LTRhOTItOTUxMC01MzU4YWUzODI4NTYifQ.ij8YEckEFEooJYLp03I0QxSI6evOheSi5UKzuDkze60',          // Add host value if needed
+          }
+        });
+
+        if (!balanceResponse.ok) {
+          throw new Error(`Balance API error: ${balanceResponse.status}`);
+        }
+
+        const balanceData = await balanceResponse.json();
+        console.log(balanceResponse)
+
+
+        // Fetch transactions
+        const transactionsResponse = await fetch(`${API_BASE_URL}/wallet/transactions`, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM0OTI0OTcsInVzZXJfaWQiOiI5OGVlOTE5ZS1kYzI4LTRhOTItOTUxMC01MzU4YWUzODI4NTYifQ.ij8YEckEFEooJYLp03I0QxSI6evOheSi5UKzuDkze60'   // Add authorization if needed
+          }
+        });
+
+        if (!transactionsResponse.ok) {
+          console.log(transactionsResponse)
+          throw new Error(`Transactions API error: ${transactionsResponse.status}`);
+        }
+
+        const transactionsData = await transactionsResponse.json();
+
+        // Update state with fetched data
+        setWalletBalance(balanceData.balance || 0);
+        setTransactions(transactionsData || []);
+
+      } catch (err) {
+        console.error('Error fetching wallet data:', err);
+        setError('Failed to load wallet data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWalletData();
+  }, []);
 
   // Calculate daily saving average
-  const dailySavingAverage = savedAmount / 30; // Assuming 30 days in a month for simplicity
+  const dailySavingAverage = walletBalance / 30; // Simplified for this example
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header searchIconShown={false} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading wallet data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header searchIconShown={false} />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <Header searchIconShown={false} />
       <ScrollView style={styles.content}>
-        {/* Saved Amount Section */}
+        {/* Wallet Balance Section */}
         <View style={styles.totalBalance}>
-            <Ionicons name="wallet" size={wp('8%')} color={COLORS.text.primary} /> {/* Icon for Left Side */}
-            <View style={styles.dailySavingTextContainer}>
+          <Ionicons name="wallet" size={wp('8%')} color={COLORS.text.primary} />
+          <View style={styles.dailySavingTextContainer}>
             <Text style={styles.totalBalanceLabel}>{'Total Amount'}</Text>
-            <Text style={[styles.totalBalanceAmount, { color: savedAmount >= 0 ? '#51cf66' : '#ff6b6b' }]}>{currencySymbol}{Math.abs(savedAmount).toFixed(2)}</Text>
+            <Text style={[styles.totalBalanceAmount, { color: walletBalance >= 0 ? '#51cf66' : '#ff6b6b' }]}>
+              {currencySymbol}{Math.abs(walletBalance).toFixed(2)}
+            </Text>
           </View>
         </View>
 
         {/* Daily Saving Average Section */}
         <View style={styles.dailySavingContainer}>
           <View style={styles.dailySavingBox}>
-            <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> {/* Icon for Left Side */}
+            <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} />
             <View style={styles.dailySavingTextContainer}>
               <Text style={styles.dailySavingLabel}>Daily Expenses</Text>
               <Text style={styles.dailySavingAmount}>{currencySymbol}{dailySavingAverage.toFixed(2)}</Text>
             </View>
           </View>
           <View style={styles.dailySavingBox}>
-            <Ionicons name="wallet" size={wp('6%')} color={COLORS.text.primary} /> {/* Icon for Left Side */}
+            <Ionicons name="wallet" size={wp('6%')} color={COLORS.text.primary} />
             <View style={styles.dailySavingTextContainer}>
               <Text style={styles.dailySavingLabel}>Daily Saving</Text>
               <Text style={styles.dailySavingAmount}>{currencySymbol}{dailySavingAverage.toFixed(2)}</Text>
@@ -70,7 +140,7 @@ const WalletScreen = () => {
         {/* Recent Transactions Section */}
         <Text style={styles.sectionTitle}>{'Recent Transactions'}</Text>
         <View style={styles.transactionsList}>
-        <TransactionOverview/>
+          <TransactionOverview transactions={transactions} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -85,22 +155,43 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  totalBalance: {
-    alignSelf:'center',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: hp('2%'),
+    fontSize: wp('4%'),
+    color: COLORS.text.primary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     padding: wp('4%'),
-    width:wp('60%'),
+  },
+  errorText: {
+    fontSize: wp('4%'),
+    color: '#ff6b6b',
+    textAlign: 'center',
+  },
+  totalBalance: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    padding: wp('4%'),
+    width: wp('60%'),
     backgroundColor: COLORS.lightbackground,
     borderRadius: wp('2%'),
     marginHorizontal: wp('2%'),
     flexDirection: 'row',
     flex: 1,
-    justifyContent:'space-evenly',
+    justifyContent: 'space-evenly',
   },
   totalBalanceLabel: {
     fontSize: wp('5%'),
     fontWeight: '400',
-    opacity:0.8,
+    opacity: 0.8,
     color: COLORS.text.primary,
   },
   totalBalanceAmount: {
@@ -122,11 +213,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.lightbackground,
     borderRadius: wp('2%'),
     marginHorizontal: wp('2%'),
-    justifyContent:'space-evenly',
-    alignItems: 'center', // Aligns both the icon and text horizontally
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
   },
   dailySavingTextContainer: {
-    marginLeft: wp('2%'), // Space between icon and text
+    marginLeft: wp('2%'),
   },
   dailySavingLabel: {
     fontSize: wp('3.5%'),
@@ -147,27 +238,6 @@ const styles = StyleSheet.create({
   },
   transactionsList: {
     // padding: wp('4%'),
-  },
-  transactionItem: {
-    marginBottom: wp('3%'),
-    padding: wp('4%'),
-    backgroundColor: COLORS.lightbackground,
-    borderRadius: wp('3%'),
-  },
-  transactionType: {
-    fontSize: wp('4.5%'),
-    fontWeight: '500',
-    color: COLORS.text.primary,
-  },
-  transactionAmount: {
-    fontSize: wp('4%'),
-    fontWeight: '500',
-    color: COLORS.text.primary,
-  },
-  transactionDate: {
-    fontSize: wp('3.5%'),
-    color: COLORS.text.secondary,
-    marginTop: hp('0.5%'),
   },
 });
 
