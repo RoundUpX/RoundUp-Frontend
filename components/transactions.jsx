@@ -3,7 +3,8 @@ import { View, TextInput, Button, TouchableOpacity, ScrollView, FlatList, Text, 
 import axios from 'axios';
 import RNPickerSelect from 'react-native-picker-select'; // Importing RNPickerSelect
 import { COLORS } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is installed and imported
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+// import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is installed and imported
 
 import { SvgXml } from "react-native-svg";
 import icons from "../assets/icons/icons"; // Import all icons
@@ -19,8 +20,23 @@ import {
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 
-const API_URL = 'http://10.42.0.1:8082/api/v1/transactions'; 
+const API_URL = 'http://10.42.0.1:8082/api/v1/transactions';
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM0MjMwODMsInVzZXJfaWQiOiI5OGVlOTE5ZS1kYzI4LTRhOTItOTUxMC01MzU4YWUzODI4NTYifQ.rSt4vBm60jIGuUfaXtbpgqefxhR5JrZ_a6KQ2zGAnGg"; // Change as needed
+
+const getFormattedDate = (dateString) => {
+  if (!dateString) return '';
+  const createdDate = new Date(dateString);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  // Compare using toDateString() to ignore time
+  if (createdDate.toDateString() === today.toDateString()) return 'Today';
+  if (createdDate.toDateString() === yesterday.toDateString()) return 'Yesterday';
+
+  // Fallback: return date in YYYY-MM-DD format
+  return createdDate.toISOString().split('T')[0];
+};
 
 const TransactionOverview = () => {
   const [transactions, setTransactions] = useState([]);
@@ -42,8 +58,6 @@ const TransactionOverview = () => {
         },
       });
 
-      console.log(response.data)
-      
       // Assuming the API returns an array of transactions in response.data
       const allTransactions = response.data;
       const userTransactions = allTransactions;
@@ -59,51 +73,6 @@ const TransactionOverview = () => {
   useEffect(() => {
     fetchTransactions();
   }, []);
-
-  const EXPENSE_CATEGORIES = [
-    { label: "Food & Dining", value: "Food & Dining" },
-    { label: "Transportation", value: "Transportation" },
-    { label: "Shopping", value: "Shopping" },
-    { label: "Entertainment", value: "Entertainment" },
-    { label: "Bills & Utilities", value: "Bills & Utilities" },
-    { label: "Health & Fitness", value: "Health & Fitness" },
-    { label: "Travel", value: "Travel" },
-    { label: "Other", value: "Other" },
-  ];
-
-  // Add a new transaction (Simulating API call)
-  const addTransaction = async () => {
-    if (!amount || !category) {
-      Alert.alert('Error', 'Amount and category are required');
-      return;
-    }
-
-    const newTransaction = {
-      amount: parseFloat(amount),
-      category,
-      merchant: merchant,
-      user_id: userID,
-    };
-
-    try {
-      setLoading(true);
-      // Post the new transaction to the API
-      const response = await axios.post(API_URL, newTransaction, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      // Assuming the API returns the created transaction in response.data
-      setTransactions(prevTransactions => [...prevTransactions, response.data]);
-      Alert.alert('Success', 'Transaction added');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to add transaction');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Display a specific transaction by ID
   const viewTransaction = (txID) => {
@@ -136,7 +105,9 @@ const TransactionOverview = () => {
                   activeOpacity={0.7}
                 >
                   <View style={styles.newContent}>
-                    <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> 
+                    <View style={styles.iconsss}>
+                      <MaterialIcons name="currency-rupee" size={wp("10%")} color={"#fff"} />
+                    </View>
                     <View style={styles.second}>
                       <View style={styles.mainContent}>
                         <View style={styles.leftContent}>
@@ -147,7 +118,7 @@ const TransactionOverview = () => {
                         <Text style={styles.amount}>{formattedAmount}</Text>
                       </View>
                       <Text style={styles.round}>
-                        {roundedAmount ? 'Rounded ' + roundedAmount : ''}
+                        {roundedAmount ? 'Saved ' + roundedAmount : ''}
                       </Text>
                       <View style={styles.bottomRow}>
                         <View style={styles.leftInfo}>
@@ -156,7 +127,7 @@ const TransactionOverview = () => {
                           </Text>
                           <Text style={styles.dot}>•</Text>
                           <Text style={styles.date}>
-                            {transaction.date || 'N/A'}
+                            {transaction.created_at.split('T')[0] || ''}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -166,7 +137,7 @@ const TransactionOverview = () => {
                           <Ionicons
                             name="search"
                             size={wp('3.8%')}
-                            color={'#8a36c9'}
+                            color={'#fff'}
                           />
                         </TouchableOpacity>
                       </View>
@@ -195,7 +166,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   newContent: {
-    alignSelf: 'center',
+    // alignSelf: 'center',
     alignItems: 'center',
     padding: wp('4%'),
     width: wp('90%'),
@@ -226,12 +197,12 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: wp('4%'),
     fontWeight: '500',
-    color: COLORS.text.secondary,
+    color: '#68bb93',
     opacity: 0.8,
   },
   round: {
     fontSize: wp('3.5%'),
-    color: '#6c757d',
+    color: '#ABA6DE',
   },
   bottomRow: {
     flexDirection: 'row',
@@ -245,7 +216,7 @@ const styles = StyleSheet.create({
   },
   merchant: {
     fontSize: wp('3.2%'),
-    color: COLORS.text.secondary,
+    color: COLORS.BETTER_Pink,
   },
   dot: {
     fontSize: wp('3.2%'),
@@ -254,7 +225,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: wp('3.2%'),
-    color: COLORS.secondary,
+    color: COLORS.SUNDAR,
     opacity: 0.7,
   },
   deleteButton: {
