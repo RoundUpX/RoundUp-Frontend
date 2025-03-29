@@ -1,17 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet, Alert, ActivityIndicator, FlatList } from 'react-native';
-import MultiSelect from 'react-native-multiple-select';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  Platform
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker'; // Ensure installed: expo install @react-native-community/datetimepicker
 import { COLORS } from '@/constants/theme';
 import Header from '../../../components/Header';
 
 const Settings = () => {
   const hardcodedPreferences = {
-    roundupCategories: ["account", "commute"],
+    roundupCategories: ["Groceries", "Transportation"],
     goalName: "Save for a trip",
     goalAmount: 5000,
     targetDate: new Date("2025-05-04"),
     currentSavings: 2000,
-    roundupHistory: [0.50, 1.00, 1.50],
+    roundupHistory: [0.5, 1.0, 1.5],
     roundupDates: [
       "2025-03-01 12:00:00",
       "2025-03-10 12:00:00",
@@ -23,21 +34,23 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Exactly 10 categories (5 for left column, 5 for right column)
   const predefinedCategories = [
-    { name: "account", id: "account" },
-    { name: "apparel", id: "apparel" },
-    { name: "Transportation", id: "commute" },
-    { name: "devices", id: "devices" },
-    { name: "grocery", id: "grocery" },
-    { name: "medications", id: "medication" },
-    { name: "money_bag", id: "money_bag" },
-    { name: "restaurant", id: "restaurant" },
-    { name: "subscriptions", id: "subscriptions" },
-    { name: "videogame", id: "videogame" },
-    { name: "wallet", id: "wallet" },
+    { name: "Groceries", id: "Groceries" },
+    { name: "Rent & Utilities", id: "Rent & Utilities" },
+    { name: "Transportation", id: "Transportation" },
+    { name: "Healthcare", id: "Healthcare" },
+    { name: "Dining & Food", id: "Dining & Food" },
+    { name: "Clothing & Accessories", id: "Clothing & Accessories" },
+    { name: "Entertainment", id: "Entertainment" },
+    { name: "Investments, Debt & Loans", id: "Investments, Debt & Loans" },
+    { name: "Technology & Gadgets", id: "Technology & Gadgets" },
+    { name: "Subscriptions & Memberships", id: "Subscriptions & Memberships" },
   ];
 
-  const multiSelectRef = useRef(null);
+  // Split into two columns of 5 each
+  const leftColumnCategories = predefinedCategories.slice(0, 5);
+  const rightColumnCategories = predefinedCategories.slice(5);
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +67,7 @@ const Settings = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setLoading(true);
     setTimeout(() => {
       Alert.alert("Preferences Updated", "Your preferences have been updated successfully.");
@@ -69,164 +82,151 @@ const Settings = () => {
     }
   };
 
+  // Toggle category selection on press
+  const toggleCategory = (categoryId) => {
+    let newCategories = [...preferences.roundupCategories];
+    if (newCategories.includes(categoryId)) {
+      newCategories = newCategories.filter((id) => id !== categoryId);
+    } else {
+      newCategories.push(categoryId);
+    }
+    handleChange('roundupCategories', newCategories);
+  };
+
+  // Render a column of category boxes
+  const renderColumn = (columnCategories) => {
+    return columnCategories.map((cat) => {
+      const selected = preferences.roundupCategories.includes(cat.id);
+      return (
+        <TouchableOpacity
+          key={cat.id}
+          style={[
+            styles.categoryBox,
+            selected && styles.categoryBoxSelected,
+          ]}
+          onPress={() => toggleCategory(cat.id)}
+        >
+          <Text style={[styles.categoryText, selected && styles.categoryTextSelected]}>
+            {cat.name}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
+  };
+
   return (
     <View style={styles.container}>
-            <Header searchIconShown={false} />
-      <Text style={styles.header}>Settings</Text>
+      <Header searchIconShown={false} />
+      <Text style={styles.mainHeader}>Settings</Text>
 
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.accent} />
       ) : (
-        <FlatList
-          data={[preferences]}
-          renderItem={() => (
-            <>
-               {/* Current Preferences Box */}
-              <View style={styles.currentPreferencesBox}>
-                <Text style={styles.subHeader}>Current Preferences</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-                <Text style={styles.label}>Roundup Categories:</Text>
-                <Text style={styles.currentValue}>
-                  {preferences.roundupCategories.join(', ')}
-                </Text>
+          {/* Preferences Overview */}
+          <View style={styles.card}>
+            <Text style={styles.sectionHeader}>Current Preferences</Text>
 
-                <Text style={styles.label}>Goal Name:</Text>
-                <Text style={styles.currentValue}>{preferences.goalName}</Text>
+            <View style={styles.preferenceItem}>
+              <Text style={styles.label}>Roundup Categories:</Text>
+              <Text style={styles.value}>
+                {preferences.roundupCategories.join(', ')}
+              </Text>
+            </View>
 
-                <Text style={styles.label}>Goal Amount:</Text>
-                <Text style={styles.currentValue}>₹{preferences.goalAmount}</Text>
+            <View style={styles.preferenceItem}>
+              <Text style={styles.label}>Goal:</Text>
+              <Text style={styles.value}>
+                {preferences.goalName} (₹{preferences.goalAmount})
+              </Text>
+            </View>
 
-                <Text style={styles.label}>Target Date:</Text>
-                <Text style={styles.currentValue}>{preferences.targetDate.toDateString()}</Text>
+            <View style={styles.preferenceItem}>
+              <Text style={styles.label}>Target Date:</Text>
+              <Text style={styles.value}>{preferences.targetDate.toDateString()}</Text>
+            </View>
 
-                <Text style={styles.label}>Current Savings:</Text>
-                <Text style={styles.currentValue}>₹{preferences.currentSavings}</Text>
+            <View style={styles.preferenceItem}>
+              <Text style={styles.label}>Current Savings:</Text>
+              <Text style={styles.value}>₹{preferences.currentSavings}</Text>
+            </View>
+          </View>
 
-                <Text style={styles.label}>Roundup History:</Text>
-                <Text style={styles.currentValue}>{preferences.roundupHistory.join(' : ')}</Text>
+          {/* Edit Preferences */}
+          <Text style={styles.sectionHeader}>Edit Preferences</Text>
 
-                <Text style={styles.label}>Roundup Dates:</Text>
-                <Text style={styles.currentValue}>{preferences.roundupDates.join('\n')}</Text>
+          {/* Categories in 2 Columns (5 left, 5 right) */}
+          <View style={styles.card}>
+            <Text style={styles.label}>Roundup Categories:</Text>
+            <View style={styles.categoryRow}>
+              {/* Left Column */}
+              <View style={styles.categoryColumn}>
+                {renderColumn(leftColumnCategories)}
               </View>
-
-              {/* Edit Preferences */}
-              <Text style={styles.subHeader}>Edit Preferences</Text>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Roundup Categories:</Text>
-                <MultiSelect
-                  ref={multiSelectRef}
-                  items={predefinedCategories}
-                  uniqueKey="id"
-                  onSelectedItemsChange={(selectedItems) =>
-                    handleChange('roundupCategories', selectedItems)
-                  }
-                  selectedItems={preferences.roundupCategories}
-                  selectText="Select Categories"
-                  styleTextDropdownSelected={styles.dropText}
-                  searchInputPlaceholderText="Search Categories..."
-                  tagRemoveIconColor={COLORS.text.secondary}
-                  tagBorderColor={COLORS.text.secondary}
-                  tagTextColor={COLORS.text.primary}
-                  selectedItemTextColor={COLORS.accent}
-                  selectedItemIconColor={COLORS.accent}
-                  itemTextColor={COLORS.text.primary}
-                  displayKey="name"
-                  searchInputStyle={{ color: COLORS.text.primary }}
-                  submitButtonColor={COLORS.primary}
-                  submitButtonText="Submit"
-                  styleDropdownMenu={styles.multiSelectDropdown}
-                  styleDropdownMenuSubsection={styles.multiSelectSubsection}
-                  styleInputGroup={{ backgroundColor: COLORS.lightbackground }}
-                  styleItemsContainer={{ backgroundColor: COLORS.lightbackground }}
-                  styleListContainer={{ backgroundColor: COLORS.lightbackground }}
-                />
+              {/* Right Column */}
+              <View style={styles.categoryColumn}>
+                {renderColumn(rightColumnCategories)}
               </View>
+            </View>
+          </View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Goal Name:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={preferences.goalName}
-                  onChangeText={(value) => handleChange('goalName', value)}
-                  placeholder="e.g., Save for a trip"
-                  placeholderTextColor={COLORS.text.secondary}
-                />
-              </View>
+          {/* Form Fields */}
+          <View style={styles.card}>
+            <Text style={styles.label}>Goal Name:</Text>
+            <TextInput
+              style={styles.input}
+              value={preferences.goalName}
+              onChangeText={(value) => handleChange('goalName', value)}
+              placeholder="Goal name"
+              placeholderTextColor={COLORS.text.secondary}
+            />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Goal Amount:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={String(preferences.goalAmount)}
-                  onChangeText={(value) => handleChange('goalAmount', value)}
-                  placeholder="e.g., 5000"
-                  placeholderTextColor={COLORS.text.secondary}
-                  keyboardType="numeric"
-                />
-              </View>
+            <Text style={styles.label}>Goal Amount:</Text>
+            <TextInput
+              style={styles.input}
+              value={String(preferences.goalAmount)}
+              onChangeText={(value) => handleChange('goalAmount', value)}
+              placeholder="Goal amount"
+              placeholderTextColor={COLORS.text.secondary}
+              keyboardType="numeric"
+            />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Target Date (TODO//):</Text>
-                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                  <TextInput
-                    style={styles.input}
-                    value={preferences.targetDate.toDateString()}
-                    editable={false}
-                    placeholderTextColor={COLORS.text.secondary}
-                  />
-                </TouchableOpacity>
-                {showDatePicker && (
-                  // NOTE: Make sure you have the correct import and usage for DateTimePicker in your project
-                  <DateTimePicker
-                    value={preferences.targetDate}
-                    mode="date"
-                    display="calendar"
-                    onChange={handleDateChange}
-                  />
-                )}
-              </View>
+            <Text style={styles.label}>Current Savings:</Text>
+            <TextInput
+              style={styles.input}
+              value={String(preferences.currentSavings)}
+              onChangeText={(value) => handleChange('currentSavings', value)}
+              placeholder="Current savings"
+              placeholderTextColor={COLORS.text.secondary}
+              keyboardType="numeric"
+            />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Current Savings:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={String(preferences.currentSavings)}
-                  onChangeText={(value) => handleChange('currentSavings', value)}
-                  placeholder="e.g., 2000"
-                  placeholderTextColor={COLORS.text.secondary}
-                  keyboardType="numeric"
-                />
-              </View>
+            <Text style={styles.label}>Target Date:</Text>
+            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+              <TextInput
+                style={styles.input}
+                value={preferences.targetDate.toDateString()}
+                editable={false}
+                placeholderTextColor={COLORS.text.secondary}
+              />
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={preferences.targetDate}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "calendar"}
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Roundup History(IDK WHY):</Text>
-                <TextInput
-                  style={styles.input}
-                  value={preferences.roundupHistory.join(', ')}
-                  onChangeText={(value) => handleChange('roundupHistory', value)}
-                  placeholder="e.g., 0.50, 1.00"
-                  placeholderTextColor={COLORS.text.secondary}
-                />
-              </View>
+          {/* Save Changes Button */}
+          <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          </TouchableOpacity>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Roundup Dates:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={preferences.roundupDates.join(': ')}
-                  onChangeText={(value) => handleChange('roundupDates', value)}
-                  placeholder="e.g., 2025-03-01, 2025-03-10"
-                  placeholderTextColor={COLORS.text.secondary}
-                />
-              </View>
-
-              <Button title="Save Changes" onPress={handleSubmit} color={COLORS.primary} />
-            </>
-          )}
-          keyExtractor={() => 'settings'}
-          contentContainerStyle={{ padding: 20 }}
-        />
+        </ScrollView>
       )}
     </View>
   );
@@ -237,67 +237,107 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    fontSize: 24,
+  scrollContainer: {
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+  },
+  mainHeader: {
+    fontSize: 26,
     fontWeight: 'bold',
+    color: COLORS.text.primary,
     textAlign: 'center',
-    // marginVertical: 20,
-    color: COLORS.text.primary,
+    marginVertical: 10,
   },
-  subHeader: {
-    fontSize: 22,    fontWeight: 'bold',
-    textAlign:'center',
-    marginTop: 10,
-    marginBottom: 10,
-    color: COLORS.text.primary,
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.accent,
+    marginVertical: 10,
+    textAlign: 'center',
   },
-  currentPreferencesBox: {
-    padding: 15,
+  card: {
     backgroundColor: COLORS.lightbackground,
-    borderRadius: 8,
+    borderRadius: 12,
+    padding: 20,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  preferenceItem: {
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.text.primary,
     marginBottom: 5,
-    color: COLORS.text.primary,
   },
-  currentValue: {
+  value: {
     fontSize: 16,
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: 'rgb(46, 55, 69)', // or use another subtle shade
+    color: COLORS.text.secondary,
+    marginTop: 5,
+    backgroundColor: 'rgb(46, 55, 69)',
     borderRadius: 5,
-    color: COLORS.text.primary,
-  },
-  inputContainer: {
-    marginBottom: 15,
+    padding: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#444', // darker border to match dark theme
-    padding: 10,
+    borderColor: COLORS.text.secondary,
+    padding: 12,
+    borderRadius: 8,
     fontSize: 16,
-    borderRadius: 5,
     color: COLORS.text.primary,
-    backgroundColor: COLORS.lightbackground,
-  },
-  multiSelectDropdown: {
     backgroundColor: COLORS.background,
-    borderRadius:50,
-    padding: 0,
-    paddingBottom:0,
-    alignItems:'center',
-    justifyContent:'center',
+    marginBottom: 15,
   },
-  multiSelectSubsection: {
+  saveButton: {
+    backgroundColor: "#584A90",
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  saveButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  categoryColumn: {
+    width: '48%',
+  },
+  categoryBox: {
+    borderWidth: 1,
+    borderColor: COLORS.text.secondary,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginVertical: 5,
     backgroundColor: COLORS.lightbackground,
+    alignItems: 'center',
+    // Same fixed size for all boxes:
+    height: 60, // Adjust if needed for multiline text
+    justifyContent: 'center',
   },
-  dropText:{
-    // textAlign:'center',
-    color:COLORS.text.primary,
-    paddingLeft:15,
+  categoryBoxSelected: {
+    backgroundColor:"#584A90",
+    borderColor: "#000",
+  },
+  categoryText: {
+    fontSize: 14,
+    color: COLORS.text.primary,
+    textAlign: 'center',
+  },
+  categoryTextSelected: {
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
 });
 
