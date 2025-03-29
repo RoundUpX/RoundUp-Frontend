@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet, Alert, ActivityIndicator, FlatList } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import { COLORS } from '@/constants/theme';
+import Header from '../../../components/Header';
 
 const Settings = () => {
   const hardcodedPreferences = {
@@ -70,6 +71,7 @@ const Settings = () => {
 
   return (
     <View style={styles.container}>
+            <Header searchIconShown={false} />
       <Text style={styles.header}>Settings</Text>
 
       {loading ? (
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    // marginVertical: 20,
     color: COLORS.text.primary,
   },
   subHeader: {
