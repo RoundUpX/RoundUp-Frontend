@@ -5,7 +5,6 @@ import { ProgressBar } from 'react-native-paper';
 import { COLORS } from "@/constants/theme";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-
 const getTransactionsByUserId = (userId) => {
   const transactions = [
     { id: 1, user_id: 1, amount: 100.00, category: 'Food', roundup: 5, date: '2025-03-21', merchant: 'Lunch' },

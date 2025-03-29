@@ -5,7 +5,6 @@ import RNPickerSelect from 'react-native-picker-select'; // Importing RNPickerSe
 import { COLORS } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is installed and imported
 
-
 import { SvgXml } from "react-native-svg";
 import icons from "../assets/icons/icons"; // Import all icons
 
@@ -20,30 +19,8 @@ import {
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 
-
-// Fake Data for Testing
-const getUsers = () => {
-  return [
-    { id: 1, username: 'john_doe', email: 'john@example.com' },
-    { id: 2, username: 'jane_smith', email: 'jane@example.com' }
-  ];
-};
-
-const getTransactionsByUserId = (userId) => {
-  const transactions = [
-    { id: 1, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '', merchant: 'Lunch' },
-    { id: 2, user_id: 1, amount: 200.50, category: 'Transportation', roundup: '2', date: '24/03/26', merchant: 'Bus fare' },
-    { id: 3, user_id: 2, amount: 50.75, category: 'Health & Fitness', roundup: '5', date: '', merchant: 'Gym membership' },
-    { id: 4, user_id: 1, amount: 210.50, category: 'Transportation', roundup: '2', date: '24/03/26', merchant: 'Bus fare' },
-    { id: 5, user_id: 1, amount: 50.75, category: 'Health & Fitness', roundup: '5', date: '', merchant: 'Gym membership' },
-    { id: 6, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '', merchant: 'Gym membership' },
-    { id: 7, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '', merchant: 'Gym membership' },
-    { id: 8, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '', merchant: 'Lunch' },
-    { id: 9, user_id: 1, amount: 150.75, category: 'Health & Fitness', roundup: '3', date: '', merchant: 'Gym membership' },
-    { id: 10, user_id: 1, amount: 100.00, category: 'Food & Dining', roundup: '1', date: '', merchant: 'Lunch' },
-  ];
-  return transactions.filter(txn => txn.user_id === userId);
-};
+const API_URL = 'http://10.42.0.1:8082/api/v1/transactions'; 
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM0MjMwODMsInVzZXJfaWQiOiI5OGVlOTE5ZS1kYzI4LTRhOTItOTUxMC01MzU4YWUzODI4NTYifQ.rSt4vBm60jIGuUfaXtbpgqefxhR5JrZ_a6KQ2zGAnGg"; // Change as needed
 
 const TransactionOverview = () => {
   const [transactions, setTransactions] = useState([]);
@@ -54,21 +31,33 @@ const TransactionOverview = () => {
 
   const userID = 1; // For testing purposes, you can use a static userID
 
-  const displayUsers = () => {
-    const users = getUsers();
-    // console.log('Users:', users);
-  };
+  // Fetch transactions from the API and filter by user ID
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `${token}`,
+          Accept: 'application/json',
+        },
+      });
 
-  // Fetch and display transactions for a specific user
-  const displayTransactionsForUser = (userId) => {
-    const transactions = getTransactionsByUserId(userId);
-    setTransactions(transactions);
-    // console.log(`Transactions for user ${userId}:`, transactions);
+      console.log(response.data)
+      
+      // Assuming the API returns an array of transactions in response.data
+      const allTransactions = response.data;
+      const userTransactions = allTransactions;
+      setTransactions(userTransactions);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch transactions');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    displayUsers(); // Display users
-    displayTransactionsForUser(userID); // Display transactions for user with ID 1 (Testing)
+    fetchTransactions();
   }, []);
 
   const EXPENSE_CATEGORIES = [
@@ -93,15 +82,24 @@ const TransactionOverview = () => {
       amount: parseFloat(amount),
       category,
       merchant: merchant,
+      user_id: userID,
     };
 
     try {
       setLoading(true);
-      // Simulate a successful API call by adding the transaction to the state
-      setTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
+      // Post the new transaction to the API
+      const response = await axios.post(API_URL, newTransaction, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      // Assuming the API returns the created transaction in response.data
+      setTransactions(prevTransactions => [...prevTransactions, response.data]);
       Alert.alert('Success', 'Transaction added');
     } catch (error) {
       Alert.alert('Error', 'Failed to add transaction');
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -122,12 +120,14 @@ const TransactionOverview = () => {
       <View style={styles.container}>
         {/* Transaction List */}
         <ScrollView>
-          {transactions.length === 0 ? (
+          {loading ? (
+            <Text>Loading transactions...</Text>
+          ) : transactions.length === 0 ? (
             <Text>No transactions found</Text>
           ) : (
             transactions.map((transaction) => {
               const formattedAmount = `₹${transaction.amount}`;
-              const roundedAmount = `₹${transaction.roundup}`;
+              const roundedAmount = transaction.roundup ? `₹${transaction.roundup}` : '';
               return (
                 <TouchableOpacity
                   key={transaction.id}
@@ -138,46 +138,39 @@ const TransactionOverview = () => {
                   <View style={styles.newContent}>
                     <Ionicons name="logo-usd" size={wp('6%')} color={COLORS.text.primary} /> 
                     <View style={styles.second}>
-                    <View style={styles.mainContent}>
-                      <View style={styles.leftContent}>
-                        <Text style={styles.category}>
-                          {transaction.category || 'Uncategorized'}
-                        </Text>
+                      <View style={styles.mainContent}>
+                        <View style={styles.leftContent}>
+                          <Text style={styles.category}>
+                            {transaction.category || 'Uncategorized'}
+                          </Text>
+                        </View>
+                        <Text style={styles.amount}>{formattedAmount}</Text>
                       </View>
-                      <Text
-                        style={styles.amount}
-                      >
-                        {formattedAmount}
+                      <Text style={styles.round}>
+                        {roundedAmount ? 'Rounded ' + roundedAmount : ''}
                       </Text>
-                    </View>
-
-                    <Text style={styles.round}>
-                      {'Rounded ' + roundedAmount || ''}
-                    </Text>
-
-                    <View style={styles.bottomRow}>
-                      <View style={styles.leftInfo}>
-                        <Text style={styles.merchant}>
-                          {transaction.merchant || ''}
-                        </Text>
-                        <Text style={styles.dot}>•</Text>
-                        <Text style={styles.date}>
-                          {transaction.date}
-                        </Text>
+                      <View style={styles.bottomRow}>
+                        <View style={styles.leftInfo}>
+                          <Text style={styles.merchant}>
+                            {transaction.merchant || ''}
+                          </Text>
+                          <Text style={styles.dot}>•</Text>
+                          <Text style={styles.date}>
+                            {transaction.date || 'N/A'}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                          style={styles.deleteButton}
+                        >
+                          <Ionicons
+                            name="search"
+                            size={wp('3.8%')}
+                            color={'#8a36c9'}
+                          />
+                        </TouchableOpacity>
                       </View>
-
-                      <TouchableOpacity
-                        // onPress={alert('You cant delete this')}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        style={styles.deleteButton}
-                      >
-                        <Ionicons
-                          name="search"
-                          size={wp('3.8%')}
-                          color={'#8a36c9'}
-                        />
-                      </TouchableOpacity>
-                    </View></View>
+                    </View>
                   </View>
                 </TouchableOpacity>
               );
@@ -185,38 +178,36 @@ const TransactionOverview = () => {
           )}
         </ScrollView>
       </View>
-
     </View>
   );
 };
 
-
-
 const styles = StyleSheet.create({
-
-  container: {
-    width:'100%',
-    padding: wp('2%'),
-    // paddingBlockEnd: wp('8%'),
-    backgroundColor: COLORS.background, // Adjust to your preferred background color
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#ddd', // Adjust the divider color as needed
+  container1: {
+    flex: 1,
+    backgroundColor: COLORS.background,
   },
-  newContent:{
-    alignSelf:'center',
+  container: {
+    width: '100%',
+    padding: wp('2%'),
+    backgroundColor: COLORS.background,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#ddd',
+  },
+  newContent: {
+    alignSelf: 'center',
     alignItems: 'center',
     padding: wp('4%'),
-    width:wp('90%'),
-    // backgroundColor: COLORS.background,
+    width: wp('90%'),
     backgroundColor: COLORS.lightbackground,
     borderRadius: wp('4%'),
     marginHorizontal: wp('2%'),
     flexDirection: 'row',
     flex: 1,
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
   },
-  second:{
-    width:'85%',
+  second: {
+    width: '85%',
   },
   mainContent: {
     flexDirection: 'row',
@@ -230,20 +221,17 @@ const styles = StyleSheet.create({
   },
   category: {
     fontSize: wp('4%'),
-    // fontWeight: '800',
-    color: COLORS.text.primary, // Adjust the text color as needed
+    color: COLORS.text.primary,
   },
   amount: {
-    // paddingRight: hp('%'),
     fontSize: wp('4%'),
     fontWeight: '500',
     color: COLORS.text.secondary,
-    opacity: 0.8
+    opacity: 0.8,
   },
   round: {
     fontSize: wp('3.5%'),
     color: '#6c757d',
-    // marginBottom: hp('1%'),
   },
   bottomRow: {
     flexDirection: 'row',
@@ -267,11 +255,19 @@ const styles = StyleSheet.create({
   date: {
     fontSize: wp('3.2%'),
     color: COLORS.secondary,
-    opacity: 0.7
+    opacity: 0.7,
   },
   deleteButton: {
     opacity: 0.6,
     padding: wp('1%'),
+  },
+  input: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    fontSize: 16,
   },
 });
 
