@@ -42,7 +42,7 @@ const TransactionOverview = () => {
         },
       });
 
-      console.log(response.data)
+      // console.log(response.data)
       
       // Assuming the API returns an array of transactions in response.data
       const allTransactions = response.data;

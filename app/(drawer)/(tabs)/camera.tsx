@@ -18,22 +18,39 @@ export default function App() {
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
+  const [validationResult, setValidationResult] = useState<any>(null);
   const cameraRef = useRef(null);
   const amountInputRef = useRef<TextInput | null>(null);
 
-  const COLORS = {
-    SEXY_white: "white",
-  };
-
   useEffect(() => {
-    if (scanned && scannedData) {
-      setTimeout(() => {
-        if (amountInputRef.current) {
-          amountInputRef.current.focus();
-        }
-      }, 100);
+    
+
+    // Reset if validation result is not valid
+    if (validationResult === false) {
+      setScanned(false);
+      setScannedData(null);
     }
-  }, [scanned, scannedData]);
+  }, [scanned, scannedData, validationResult]);
+
+  const validateUPI = async (upiUrl: string) => {
+    try {
+      const response = await fetch("http://10.42.0.1:8082/api/v1/upi/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: upiUrl }),
+      });
+      const result = await response.json();
+      setValidationResult(result.valid);
+      // console.log(result.valid);
+    } catch (error) {
+      console.log("UPI Validation Error:", error);
+      setValidationResult(null);
+      setScanned(false);
+      setScannedData(null);
+    }
+  };
 
   if (!permission) {
     return <View />;
@@ -49,10 +66,6 @@ export default function App() {
       </View>
     );
   }
-
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  };
 
   const handleBarcodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
@@ -71,26 +84,7 @@ export default function App() {
         }}
       />
 
-      {!scanned && (
-        <View style={styles.overlay}>
-          <View style={styles.scannerFrame}>
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-          </View>
-        </View>
-      )}
-
-      {!scanned && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.buttonText}>Flip Camera</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {scanned && scannedData ? (
+      {scanned && validateUPI(scannedData) && validationResult ? (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.paymentContainer}
@@ -123,11 +117,6 @@ export default function App() {
   );
 }
 
-const { width } = Dimensions.get("window");
-const scannerSize = Math.min(width * 0.7, 300);
-const cornerLength = 40;
-const cornerWidth = 6;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -143,63 +132,6 @@ const styles = StyleSheet.create({
   },
   camera: {
     ...StyleSheet.absoluteFillObject,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  scannerFrame: {
-    width: scannerSize,
-    height: scannerSize,
-  },
-  corner: {
-    position: "absolute",
-    width: cornerLength,
-    height: cornerLength,
-    borderColor: "white",
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderTopWidth: 8,
-    borderLeftWidth: 8,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderTopWidth: 8,
-    borderRightWidth: 8,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: 8,
-    borderLeftWidth: 8,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderRightWidth: cornerWidth,
-    borderBottomWidth: cornerWidth,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-
-  buttonContainer: {
-    position: "absolute",
-    bottom: 40,
-    alignSelf: "center",
-  },
-  button: {
-    padding: 10,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    borderRadius: 5,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "white",
   },
   paymentContainer: {
     position: "absolute",
@@ -222,7 +154,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
   },
-
   amountInput: {
     borderWidth: 1,
     borderColor: "gray",
