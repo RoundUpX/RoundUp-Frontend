@@ -4,6 +4,11 @@ export const COLORS = {
     background: '#101010',
     whiteBg: "#fff",
     lightbackground: "#2E2D3B",
+
+    dreamCont: {
+      primary: '#88D9E6',
+      secondary: '#584A90',
+    },
     
     text: {
       primary: '#fff',
