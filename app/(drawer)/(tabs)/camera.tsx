@@ -22,13 +22,14 @@ export default function App() {
   const cameraRef = useRef(null);
   const amountInputRef = useRef<TextInput | null>(null);
 
-  useEffect(() => {
-    
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM0MjMwODMsInVzZXJfaWQiOiI5OGVlOTE5ZS1kYzI4LTRhOTItOTUxMC01MzU4YWUzODI4NTYifQ.rSt4vBm60jIGuUfaXtbpgqefxhR5JrZ_a6KQ2zGAnGg"; // Change as needed
+  const categories = ["Transport", "Groceries", "Dining", "Entertainment", "Utilities"];
 
-    // Reset if validation result is not valid
+  useEffect(() => {
     if (validationResult === false) {
       setScanned(false);
       setScannedData(null);
+      console.log(validationResult);
     }
   }, [scanned, scannedData, validationResult]);
 
@@ -43,7 +44,6 @@ export default function App() {
       });
       const result = await response.json();
       setValidationResult(result.valid);
-      // console.log(result.valid);
     } catch (error) {
       console.log("UPI Validation Error:", error);
       setValidationResult(null);
@@ -70,6 +70,51 @@ export default function App() {
   const handleBarcodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
     setScannedData(data);
+  };
+
+  const extractMerchant = (upiString: string) => {
+    const match = upiString.match(/pa=([^&]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+  const handlePayment = async () => {
+    if (!scannedData || !amount) {
+      console.log("Missing scanned data or amount");
+      return;
+    }
+
+    const merchant = extractMerchant(scannedData);
+    if (!merchant) {
+      console.log("Invalid UPI data");
+      return;
+    }
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+
+    const transactionData = {
+      amount: parseFloat(amount),
+      category: randomCategory,
+      merchant: merchant,
+      roundup_enabled: true,
+    };
+
+    try {
+      const response = await fetch("http://10.42.0.1:8082/api/v1/transaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(transactionData),
+      });
+      const result = await response.json();
+      console.log("Transaction Response:", result);
+    } catch (error) {
+      console.log("Transaction Error:", error);
+    }
+
+    setAmount("");
+    setScanned(false);
+    setScannedData(null);
   };
 
   return (
@@ -104,12 +149,7 @@ export default function App() {
           />
           <Button
             title="Pay"
-            onPress={() => {
-              console.log("Paying", amount, "to", scannedData);
-              setAmount("");
-              setScanned(false);
-              setScannedData(null);
-            }}
+            onPress={handlePayment}
           />
         </KeyboardAvoidingView>
       ) : null}
