@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, FlatList } from 'react-native';
-import MultiSelect from 'react-native-multiple-select'; // For multiple category selection
-import DateTimePicker from '@react-native-community/datetimepicker'; // For Date Picker
+import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet, Alert, ActivityIndicator, FlatList } from 'react-native';
+import MultiSelect from 'react-native-multiple-select';
+import { COLORS } from '@/constants/theme';
 
 const Settings = () => {
   const hardcodedPreferences = {
-    roundupCategories: ["account", "Transportation"],
+    roundupCategories: ["account", "commute"],
     goalName: "Save for a trip",
     goalAmount: 5000,
-    targetDate: new Date("2025-05-04"), // Use Date object for date picker
+    targetDate: new Date("2025-05-04"),
     currentSavings: 2000,
     roundupHistory: [0.50, 1.00, 1.50],
     roundupDates: [
@@ -18,9 +18,9 @@ const Settings = () => {
     ]
   };
 
-  const [preferences, setPreferences] = useState(hardcodedPreferences); // Using hardcoded data for now
+  const [preferences, setPreferences] = useState(hardcodedPreferences);
   const [loading, setLoading] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false); // State for Date Picker visibility
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const predefinedCategories = [
     { name: "account", id: "account" },
@@ -41,9 +41,9 @@ const Settings = () => {
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
-      setPreferences(hardcodedPreferences); // Set hardcoded preferences after mock delay
+      setPreferences(hardcodedPreferences);
       setLoading(false);
-    }, 500); // Mock API delay
+    }, 500);
   }, []);
 
   const handleChange = (name, value) => {
@@ -58,7 +58,7 @@ const Settings = () => {
     setTimeout(() => {
       Alert.alert("Preferences Updated", "Your preferences have been updated successfully.");
       setLoading(false);
-    }, 1000); // Mock API delay
+    }, 1000);
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -69,22 +69,24 @@ const Settings = () => {
   };
 
   return (
-    <View style={styles.scrollViewContainer}>
+    <View style={styles.container}>
       <Text style={styles.header}>Settings</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={COLORS.accent} />
       ) : (
         <FlatList
-          data={[preferences]} // Passing the preferences as a single-item array to use FlatList
+          data={[preferences]}
           renderItem={() => (
             <>
-              {/* Displaying current preferences in a distinct box with a different color */}
+               {/* Current Preferences Box */}
               <View style={styles.currentPreferencesBox}>
-                <Text style={styles.subHeader}>Current Preferences:</Text>
+                <Text style={styles.subHeader}>Current Preferences</Text>
 
                 <Text style={styles.label}>Roundup Categories:</Text>
-                <Text style={styles.currentValue}>{preferences.roundupCategories.join(', ')}</Text>
+                <Text style={styles.currentValue}>
+                  {preferences.roundupCategories.join(', ')}
+                </Text>
 
                 <Text style={styles.label}>Goal Name:</Text>
                 <Text style={styles.currentValue}>{preferences.goalName}</Text>
@@ -99,34 +101,43 @@ const Settings = () => {
                 <Text style={styles.currentValue}>₹{preferences.currentSavings}</Text>
 
                 <Text style={styles.label}>Roundup History:</Text>
-                <Text style={styles.currentValue}>{preferences.roundupHistory.join(', ')}</Text>
+                <Text style={styles.currentValue}>{preferences.roundupHistory.join(' : ')}</Text>
 
                 <Text style={styles.label}>Roundup Dates:</Text>
-                <Text style={styles.currentValue}>{preferences.roundupDates.join(', ')}</Text>
+                <Text style={styles.currentValue}>{preferences.roundupDates.join('\n')}</Text>
               </View>
 
-              <Text style={styles.subHeader}>Edit Preferences:</Text>
+              {/* Edit Preferences */}
+              <Text style={styles.subHeader}>Edit Preferences</Text>
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Roundup Categories:</Text>
                 <MultiSelect
                   ref={multiSelectRef}
                   items={predefinedCategories}
-                  uniqueKey="name"
-                  onSelectedItemsChange={(selectedItems) => handleChange('roundupCategories', selectedItems)}
+                  uniqueKey="id"
+                  onSelectedItemsChange={(selectedItems) =>
+                    handleChange('roundupCategories', selectedItems)
+                  }
                   selectedItems={preferences.roundupCategories}
                   selectText="Select Categories"
+                  styleTextDropdownSelected={styles.dropText}
                   searchInputPlaceholderText="Search Categories..."
-                  tagRemoveIconColor="#CCC"
-                  tagBorderColor="#CCC"
-                  tagTextColor="#333"
-                  selectedItemTextColor="#CCC"
-                  selectedItemIconColor="#CCC"
-                  itemTextColor="#000"
+                  tagRemoveIconColor={COLORS.text.secondary}
+                  tagBorderColor={COLORS.text.secondary}
+                  tagTextColor={COLORS.text.primary}
+                  selectedItemTextColor={COLORS.accent}
+                  selectedItemIconColor={COLORS.accent}
+                  itemTextColor={COLORS.text.primary}
                   displayKey="name"
-                  searchInputStyle={{ color: '#CCC' }}
-                  submitButtonColor="#48BBEC"
+                  searchInputStyle={{ color: COLORS.text.primary }}
+                  submitButtonColor={COLORS.primary}
                   submitButtonText="Submit"
+                  styleDropdownMenu={styles.multiSelectDropdown}
+                  styleDropdownMenuSubsection={styles.multiSelectSubsection}
+                  styleInputGroup={{ backgroundColor: COLORS.lightbackground }}
+                  styleItemsContainer={{ backgroundColor: COLORS.lightbackground }}
+                  styleListContainer={{ backgroundColor: COLORS.lightbackground }}
                 />
               </View>
 
@@ -137,6 +148,7 @@ const Settings = () => {
                   value={preferences.goalName}
                   onChangeText={(value) => handleChange('goalName', value)}
                   placeholder="e.g., Save for a trip"
+                  placeholderTextColor={COLORS.text.secondary}
                 />
               </View>
 
@@ -147,19 +159,23 @@ const Settings = () => {
                   value={String(preferences.goalAmount)}
                   onChangeText={(value) => handleChange('goalAmount', value)}
                   placeholder="e.g., 5000"
+                  placeholderTextColor={COLORS.text.secondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Target Date:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={preferences.targetDate.toDateString()}
-                  onFocus={() => setShowDatePicker(true)} // Trigger date picker on focus
-                  editable={false} // Disable direct editing, only allow date picker
-                />
+                <Text style={styles.label}>Target Date (TODO//):</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                  <TextInput
+                    style={styles.input}
+                    value={preferences.targetDate.toDateString()}
+                    editable={false}
+                    placeholderTextColor={COLORS.text.secondary}
+                  />
+                </TouchableOpacity>
                 {showDatePicker && (
+                  // NOTE: Make sure you have the correct import and usage for DateTimePicker in your project
                   <DateTimePicker
                     value={preferences.targetDate}
                     mode="date"
@@ -176,17 +192,19 @@ const Settings = () => {
                   value={String(preferences.currentSavings)}
                   onChangeText={(value) => handleChange('currentSavings', value)}
                   placeholder="e.g., 2000"
+                  placeholderTextColor={COLORS.text.secondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Roundup History:</Text>
+                <Text style={styles.label}>Roundup History(IDK WHY):</Text>
                 <TextInput
                   style={styles.input}
-                  value={preferences.roundupHistory.join(', ')} // assuming it's an array
+                  value={preferences.roundupHistory.join(', ')}
                   onChangeText={(value) => handleChange('roundupHistory', value)}
                   placeholder="e.g., 0.50, 1.00"
+                  placeholderTextColor={COLORS.text.secondary}
                 />
               </View>
 
@@ -194,13 +212,14 @@ const Settings = () => {
                 <Text style={styles.label}>Roundup Dates:</Text>
                 <TextInput
                   style={styles.input}
-                  value={preferences.roundupDates.join(', ')} // assuming it's an array
+                  value={preferences.roundupDates.join(': ')}
                   onChangeText={(value) => handleChange('roundupDates', value)}
                   placeholder="e.g., 2025-03-01, 2025-03-10"
+                  placeholderTextColor={COLORS.text.secondary}
                 />
               </View>
 
-              <Button title="Save Changes" onPress={handleSubmit} />
+              <Button title="Save Changes" onPress={handleSubmit} color={COLORS.primary} />
             </>
           )}
           keyExtractor={() => 'settings'}
@@ -212,50 +231,71 @@ const Settings = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollViewContainer: {
+  container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  currentPreferencesBox: {
-    padding: 15,
-    backgroundColor: '#f0f8ff',
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  currentValue: {
-    fontSize: 16,
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#e0f7fa',
-    borderRadius: 5,
+    backgroundColor: COLORS.background,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
+    color: COLORS.text.primary,
   },
   subHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 20,
+    fontSize: 22,    fontWeight: 'bold',
+    textAlign:'center',
+    marginTop: 10,
     marginBottom: 10,
+    color: COLORS.text.primary,
+  },
+  currentPreferencesBox: {
+    padding: 15,
+    backgroundColor: COLORS.lightbackground,
+    borderRadius: 8,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 5,
+    color: COLORS.text.primary,
+  },
+  currentValue: {
+    fontSize: 16,
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: 'rgb(46, 55, 69)', // or use another subtle shade
+    borderRadius: 5,
+    color: COLORS.text.primary,
   },
   inputContainer: {
     marginBottom: 15,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#444', // darker border to match dark theme
     padding: 10,
     fontSize: 16,
     borderRadius: 5,
+    color: COLORS.text.primary,
+    backgroundColor: COLORS.lightbackground,
+  },
+  multiSelectDropdown: {
+    backgroundColor: COLORS.background,
+    borderRadius:50,
+    padding: 0,
+    paddingBottom:0,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  multiSelectSubsection: {
+    backgroundColor: COLORS.lightbackground,
+  },
+  dropText:{
+    // textAlign:'center',
+    color:COLORS.text.primary,
+    paddingLeft:15,
   },
 });
 
