@@ -22,17 +22,17 @@ import {
 
 const getTransactionsByUserId = (userId) => {
   const transactions = [
-    { id: 1, user_id: 1, amount: 100.0, category: "Food", roundup: 5, date: "2025-03-21", merchant: "Lunch" },
+    { id: 1, user_id: 1, amount: 100.0, category: "Food", roundup: 59, date: "2025-03-21", merchant: "Lunch" },
     { id: 2, user_id: 1, amount: 210.5, category: "Transportation", roundup: 2, date: "2025-03-25", merchant: "Bus fare" },
     { id: 3, user_id: 1, amount: 100.0, category: "Food", roundup: 1, date: "2025-03-25", merchant: "Lunch" },
-    { id: 4, user_id: 2, amount: 100.0, category: "Food", roundup: 1, date: "2025-03-25", merchant: "Lunch" },
+    { id: 4, user_id: 2, amount: 100.0, category: "Food", roundup: 91, date: "2025-03-25", merchant: "Lunch" },
     { id: 5, user_id: 1, amount: 150.75, category: "Health", roundup: 3, date: "2025-03-26", merchant: "Gym membership" },
-    { id: 6, user_id: 2, amount: 50.75, category: "Health", roundup: 5, date: "2025-03-26", merchant: "Gym membership" },
-    { id: 7, user_id: 2, amount: 150.75, category: "Health", roundup: 3, date: "2025-03-26", merchant: "Gym membership" },
+    { id: 6, user_id: 2, amount: 50.75, category: "Health", roundup: 55, date: "2025-03-26", merchant: "Gym membership" },
+    { id: 7, user_id: 2, amount: 150.75, category: "Health", roundup: 43, date: "2025-03-26", merchant: "Gym membership" },
     { id: 8, user_id: 1, amount: 200.5, category: "Transportation", roundup: 10, date: "2025-03-27", merchant: "Bus fare" },
-    { id: 9, user_id: 1, amount: 150.75, category: "Health", roundup: 3, date: "2025-03-27", merchant: "Gym membership" },
-    { id: 10, user_id: 1, amount: 150.75, category: "Health", roundup: 3, date: "2025-03-27", merchant: "Gym membership" },
-    { id: 11, user_id: 1, amount: 50.75, category: "Health", roundup: 5, date: "2025-03-28", merchant: "Gym membership" },
+    { id: 9, user_id: 1, amount: 150.75, category: "Health", roundup: 43, date: "2025-03-27", merchant: "Gym membership" },
+    { id: 10, user_id: 1, amount: 150.75, category: "Health", roundup: 103, date: "2025-03-27", merchant: "Gym membership" },
+    { id: 11, user_id: 1, amount: 50.75, category: "Health", roundup: 95, date: "2025-03-28", merchant: "Gym membership" },
     { id: 12, user_id: 1, amount: 100.0, category: "Food", roundup: 14, date: "2025-03-28", merchant: "Lunch" },
     { id: 13, user_id: 1, amount: 100.0, category: "Food", roundup: 1, date: "2025-03-28", merchant: "Lunch" },
   ];
@@ -41,7 +41,7 @@ const getTransactionsByUserId = (userId) => {
 
 const Analysis = () => {
   const userId = 1;
-  const goalAmount = 100.0;
+  const goalAmount = 1000.0;
   const transactions = getTransactionsByUserId(userId);
 
   const totalSaved = transactions.reduce((acc, txn) => acc + txn.roundup, 0);
@@ -87,7 +87,7 @@ const Analysis = () => {
           end={{ x: 1, y: 1 }}
           style={styles.DreamContainer}
         >
-          <Text style={styles.chartTitle}>Goal Name</Text>
+          <Text style={styles.chartTitle}>Trip to Shillong</Text>
           <Text style={styles.progressText}>
             <Text style={styles.boldText}>{"₹" + remainingGoalAmount.toFixed(2)}</Text>
             {" remaining"}
